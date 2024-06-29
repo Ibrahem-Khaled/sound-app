@@ -4,6 +4,7 @@ use App\Http\Controllers\dashboard\BookController;
 use App\Http\Controllers\dashboard\CategoryController;
 use App\Http\Controllers\dashboard\MediaController;
 use App\Http\Controllers\dashboard\subCategoryController;
+use App\Http\Controllers\dashboard\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,4 +27,6 @@ Route::resource('categories', CategoryController::class);
 Route::resource('subcategories', subCategoryController::class);
 Route::resource('media', MediaController::class);
 Route::resource('books', BookController::class);
+Route::resource('users', UserController::class);
+
 

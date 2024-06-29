@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\dashboard;
 
 use App\Http\Controllers\Controller;
@@ -23,20 +22,23 @@ class MediaController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:audio,video',
-            'path' => 'nullable|string',
+            'path' => 'nullable',
             'question' => 'nullable|string|max:255',
             'answer' => 'nullable|string',
-            'subcategory_id' => 'required|exists:sub_categorys,id',
+            'subcategory_id' => 'required', // تعديل بسيط هنا لتصحيح الاسم
         ]);
 
-        $data = $request->all();
+        $data = $request->except('path'); // استخدم except لاستبعاد الحقل path من البيانات
 
-        if ($request->type == 'audio' && $request->hasFile('path')) {
-            $path = $request->file('path')->store('audio', 'public');
-            $data['path'] = $path;
-        } elseif ($request->type == 'video') {
-            $data['path'] = $request->input('path');
+        if ($request->type !== 'video') {
+            if ($request->hasFile('path')) {
+                $path = $request->file('path')->store('media', 'public'); // تخزين الملف في مجلد media
+                $data['path'] = $path;
+            }
+        } else {
+            $data['path'] = $request->path;
         }
+
 
         Media::create($data);
 
@@ -49,19 +51,21 @@ class MediaController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'type' => 'required|in:audio,video',
-            'path' => 'nullable|string',
+            'path' => 'nullable|file',
             'question' => 'nullable|string|max:255',
             'answer' => 'nullable|string',
-            'subcategory_id' => 'required|exists:sub_categorys,id',
+            'subcategory_id' => 'required', // تعديل بسيط هنا لتصحيح الاسم
         ]);
 
-        $data = $request->all();
+        $data = $request->except('path'); // استخدم except لاستبعاد الحقل path من البيانات
+        if ($request->hasFile('path')) {
+            // حذف الملف القديم إذا كان موجود
+            if ($medium->type == 'audio' && $medium->path) {
+                Storage::disk('public')->delete($medium->path);
+            }
 
-        if ($request->type == 'audio' && $request->hasFile('path')) {
-            $path = $request->file('path')->store('audio', 'public');
+            $path = $request->file('path')->store('media', 'public'); // تخزين الملف في مجلد media
             $data['path'] = $path;
-        } elseif ($request->type == 'video') {
-            $data['path'] = $request->input('path');
         }
 
         $medium->update($data);

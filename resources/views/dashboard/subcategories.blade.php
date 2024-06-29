@@ -62,7 +62,7 @@
                         <td>{{ $subcategory->id }}</td>
                         <td>{{ $subcategory->name }}</td>
                         <td>{{ $subcategory->slug }}</td>
-                        <td>{{ $subcategory->category->name }}</td>
+                        <td>{{ $subcategory?->category->name }}</td>
                         <td>
                             <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
                                 data-target="#editSubCategoryModal{{ $subcategory->id }}">

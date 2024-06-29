@@ -94,7 +94,7 @@
                         <td>{{ $medium->path }}</td>
                         <td>{{ $medium->question }}</td>
                         <td>{{ $medium->answer }}</td>
-                        <td>{{ $medium->subcategory->name }}</td>
+                        <td>{{ $medium?->subcategory->name }}</td>
                         <td>
                             <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
                                 data-target="#editMediaModal{{ $medium->id }}">

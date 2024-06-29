@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('question')->nullable();
             $table->text('answer')->nullable();
             $table->bigInteger('subcategory_id')->unsigned();
+            $table->foreign('subcategory_id')->references('id')->on('sub_categorys')->onDelete('cascade');
             $table->timestamps();
         });
     }

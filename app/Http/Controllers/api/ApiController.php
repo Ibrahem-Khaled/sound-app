@@ -59,4 +59,11 @@ class ApiController extends Controller
         $books = Book::all();
         return response()->json($books, 200);
     }
+
+    public function search($query)
+    {
+        $search = Media::where('title', 'like', '%' . $query . '%')->get();
+        $books = Book::where('title', 'like', '%' . $query . '%')->get();
+        return response()->json(['search' => $search, 'books' => $books], 200);
+    }
 }

@@ -63,7 +63,7 @@ class ApiController extends Controller
     public function search($query)
     {
         $search = Media::where('title', 'like', '%' . $query . '%')->get();
-        $books = Book::where('title', 'like', '%' . $query . '%')->get();
+        $books = Book::where('name', 'like', '%' . $query . '%')->orWhere('slug', 'like', '%' . $query . '%')->get();
         return response()->json(['search' => $search, 'books' => $books], 200);
     }
 }

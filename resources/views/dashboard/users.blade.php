@@ -27,6 +27,7 @@
                     <th>Instagram</th>
                     <th>LinkedIn</th>
                     <th>Telegram</th>
+                    <th>image</th>
                     <th width="280px">Action</th>
                 </tr>
             </thead>
@@ -42,6 +43,7 @@
                         <td>{{ $user->instagram }}</td>
                         <td>{{ $user->linkedin }}</td>
                         <td>{{ $user->telegram }}</td>
+                        <td><img src="{{ asset('storage/' . $user->image) }}" width="100"></td>
                         <td>
                             <button type="button" class="btn btn-info editBtn" data-id="{{ $user->id }}"
                                 data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
@@ -66,7 +68,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('users.store') }}" method="POST">
+                    <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
@@ -101,6 +103,10 @@
                             <input type="text" class="form-control" id="linkedin" name="linkedin">
                         </div>
                         <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                        </div>
+                        <div class="mb-3">
                             <label for="telegram" class="form-label">Telegram</label>
                             <input type="text" class="form-control" id="telegram" name="telegram">
                         </div>
@@ -120,7 +126,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST">
+                    <form id="editForm" method="POST" >
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
@@ -154,6 +160,10 @@
                         <div class="mb-3">
                             <label for="edit_linkedin" class="form-label">LinkedIn</label>
                             <input type="text" class="form-control" id="edit_linkedin" name="linkedin">
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
                         </div>
                         <div class="mb-3">
                             <label for="edit_telegram" class="form-label">Telegram</label>

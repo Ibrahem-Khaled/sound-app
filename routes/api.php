@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('categorieyVideo', [ApiController::class, 'categorieyVideo']);
 Route::get('categorieyAudio', [ApiController::class, 'categorieyAudio']);
 Route::get('subCategoreys/{id}', [ApiController::class, 'subCategoreys']);
-Route::get('media/{type}', [ApiController::class, 'media']);
+Route::get('media/{type}/{subCateId}', [ApiController::class, 'media']);
 Route::get('sovieMedia/{id}', [ApiController::class, 'sovieMedia']);
 Route::get('aboutUs', [ApiController::class, 'aboutUs']);
+Route::get('books', [ApiController::class, 'books']);

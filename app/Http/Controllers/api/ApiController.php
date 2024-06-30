@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Category;
 use App\Models\Media;
 use App\Models\User;
@@ -35,9 +36,9 @@ class ApiController extends Controller
         return response()->json($subcategories, 200);
     }
 
-    public function media($type)
+    public function media($type, $subCateId)
     {
-        $media = Media::where('type', $type)->get();
+        $media = Media::where('type', $type)->where('subcategory_id', $subCateId)->get();
         return response()->json($media, 200);
     }
 
@@ -51,5 +52,11 @@ class ApiController extends Controller
     {
         $user = User::first();
         return response()->json($user, 200);
+    }
+
+    public function books()
+    {
+        $books = Book::all();
+        return response()->json($books, 200);
     }
 }

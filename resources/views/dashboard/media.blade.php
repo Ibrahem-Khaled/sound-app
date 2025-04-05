@@ -18,7 +18,7 @@
 
         <!-- Add Media Modal -->
         <div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg"> <!-- تم تكبير الحجم لجعل العناصر مرتبة بشكل أفضل -->
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="mediaModalLabel">إضافة وسائط</h5>
@@ -27,68 +27,37 @@
                     <form action="{{ route('media.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
-                            <div id="audioInputsContainer">
-                                <div class="audio-input-group mb-4 border p-3 rounded">
-                                    <h5 class="text-primary">ملف صوتي</h5>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="title[]" class="form-label">عنوان الوسائط</label>
-                                                <input type="text" class="form-control" name="title[]"
-                                                    placeholder="عنوان الوسائط">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="type" class="form-label">نوع الوسائط</label>
-                                            <select class="form-control" name="type[]" onchange="toggleMediaInput(this)"
-                                                required>
-                                                <option value="audio">صوتي</option>
-                                                <option value="video">مرئي</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group" id="audioInput">
-                                            <label for="path[]" class="form-label">رفع ملف الصوت</label>
-                                            <input type="file" class="form-control" name="path[]" accept="audio/*">
-                                        </div>
-                                        <div class="form-group d-none" id="videoInput">
-                                            <label for="video_path[]" class="form-label">رابط الفيديو</label>
-                                            <input type="text" class="form-control" name="path[]"
-                                                placeholder="أدخل رابط الفيديو">
-                                        </div>
+                            <div class="form-group mb-4">
+                                <label for="mediaType" class="form-label">نوع الوسائط</label>
+                                <select class="form-control" id="mediaType" name="mediaType" required>
+                                    <option value="audio">صوتي</option>
+                                    <option value="video">مرئي</option>
+                                </select>
+                            </div>
 
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="question[]" class="form-label">السؤال</label>
-                                                <input type="text" class="form-control" name="question[]"
-                                                    placeholder="السؤال">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="answer[]" class="form-label">الإجابة</label>
-                                                <textarea class="form-control" name="answer[]" rows="2" placeholder="الإجابة"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="subcategory_id[]" class="form-label">الفئة الفرعية</label>
-                                                <select class="form-control" name="subcategory_id[]">
-                                                    @foreach ($subcategories as $subcategory)
-                                                        <option value="{{ $subcategory->id }}">{{ $subcategory->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 d-flex align-items-end">
-                                            <button type="button" class="btn btn-danger btn-sm mt-2 w-100"
-                                                onclick="removeAudioInput(this)">إزالة</button>
-                                        </div>
-                                    </div>
+                            <div id="mediaInputSection">
+                                <!-- قسم اختيار الملفات المتعددة -->
+                                <div class="form-group mb-4" id="multipleAudioSection">
+                                    <label for="audioFiles" class="form-label">اختر ملفات صوتية متعددة</label>
+                                    <input type="file" class="form-control" id="audioFiles" name="audioFiles[]"
+                                        accept="audio/*" multiple>
+                                    <small class="text-muted">يمكنك اختيار أكثر من ملف صوتي مرة واحدة</small>
+                                </div>
+
+                                <!-- قسم الفيديو (مخفي بشكل افتراضي) -->
+                                <div class="form-group mb-4 d-none" id="videoSection">
+                                    <label for="videoUrl" class="form-label">رابط الفيديو</label>
+                                    <input type="text" class="form-control" id="videoUrl" name="videoUrl"
+                                        placeholder="أدخل رابط الفيديو">
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-success mt-3 w-100" onclick="addAudioInput()">إضافة ملف
-                                صوتي آخر</button>
+
+                            <div id="mediaFieldsContainer">
+                                <!-- سيتم إنشاء الحقول هنا تلقائيا بعد اختيار الملفات -->
+                                <div class="alert alert-info">
+                                    سيتم إنشاء حقول لكل وسائط بعد الاختيار
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
@@ -98,7 +67,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Media Table -->
         <table class="table table-bordered">
@@ -122,7 +90,19 @@
                         <td>{{ $medium->title }}</td>
                         <td>{{ $medium->description }}</td>
                         <td>{{ $medium->type }}</td>
-                        <td>{{ $medium->path }}</td>
+                        <td>
+                            @if ($medium->type == 'audio')
+                                <button type="button" class="btn btn-sm btn-info play-audio-btn"
+                                    data-audio-src="{{ asset('storage/' . $medium->path) }}">
+                                    <i class="fas fa-play"></i> تشغيل
+                                </button>
+                                <audio class="d-none" id="audioPlayer{{ $medium->id }}">
+                                    <source src="{{ asset('storage/' . $medium->path) }}" type="audio/mpeg">
+                                </audio>
+                            @else
+                                {{ $medium->path }}
+                            @endif
+                        </td>
                         <td>{{ $medium->question }}</td>
                         <td>{{ $medium->answer }}</td>
                         <td>{{ $medium?->subcategory->name }}</td>
@@ -181,6 +161,12 @@
                                             <label for="path{{ $medium->id }}">رفع ملف الصوت</label>
                                             <input type="file" class="form-control" id="path{{ $medium->id }}"
                                                 name="path">
+                                            @if ($medium->type == 'audio')
+                                                <button type="button" class="btn btn-sm btn-info mt-2 play-audio-btn"
+                                                    data-audio-src="{{ asset('storage/' . $medium->path) }}">
+                                                    <i class="fas fa-play"></i> تشغيل الملف الحالي
+                                                </button>
+                                            @endif
                                         </div>
                                         <div class="form-group @if ($medium->type != 'video') d-none @endif"
                                             id="videoInput{{ $medium->id }}">
@@ -224,18 +210,147 @@
     </div>
 
     <script>
-        function toggleMediaInput(selectElement) {
-            const audioInput = selectElement.closest('.audio-input-group').querySelector('#audioInput');
-            const videoInput = selectElement.closest('.audio-input-group').querySelector('#videoInput');
+        document.addEventListener('DOMContentLoaded', function() {
+            const mediaTypeSelect = document.getElementById('mediaType');
+            const multipleAudioSection = document.getElementById('multipleAudioSection');
+            const videoSection = document.getElementById('videoSection');
+            const audioFilesInput = document.getElementById('audioFiles');
+            const mediaFieldsContainer = document.getElementById('mediaFieldsContainer');
 
-            if (selectElement.value === 'audio') {
-                audioInput.classList.remove('d-none');
-                videoInput.classList.add('d-none');
-            } else {
-                audioInput.classList.add('d-none');
-                videoInput.classList.remove('d-none');
-            }
-        }
+            // تغيير نوع الوسائط
+            mediaTypeSelect.addEventListener('change', function() {
+                if (this.value === 'audio') {
+                    multipleAudioSection.classList.remove('d-none');
+                    videoSection.classList.add('d-none');
+                } else {
+                    multipleAudioSection.classList.add('d-none');
+                    videoSection.classList.remove('d-none');
+                    mediaFieldsContainer.innerHTML = `
+                        <div class="media-input-group mb-4 border p-3 rounded">
+                            <h5 class="text-primary">فيديو</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label">عنوان الوسائط</label>
+                                        <input type="text" class="form-control" name="title[]" placeholder="عنوان الوسائط">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="videoUrl" class="form-label">رابط الفيديو</label>
+                                        <input type="text" class="form-control" name="path[]" value="${document.getElementById('videoUrl').value}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="question" class="form-label">السؤال</label>
+                                        <input type="text" class="form-control" name="question[]" placeholder="السؤال">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="answer" class="form-label">الإجابة</label>
+                                        <textarea class="form-control" name="answer[]" rows="2" placeholder="الإجابة"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="subcategory_id" class="form-label">الفئة الفرعية</label>
+                                        <select class="form-control" name="subcategory_id[]">
+                                            @foreach ($subcategories as $subcategory)
+                                                <option value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // عند اختيار ملفات صوتية متعددة
+            audioFilesInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                mediaFieldsContainer.innerHTML = '';
+
+                if (files.length > 0 && mediaTypeSelect.value === 'audio') {
+                    Array.from(files).forEach((file, index) => {
+                        const audioFieldGroup = document.createElement('div');
+                        audioFieldGroup.className = 'media-input-group mb-4 border p-3 rounded';
+                        audioFieldGroup.innerHTML = `
+                            <h5 class="text-primary">ملف صوتي ${index + 1}</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="title_${index}" class="form-label">عنوان الوسائط</label>
+                                        <input type="text" class="form-control" name="title[]" id="title_${index}" placeholder="عنوان الوسائط">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">معاينة الصوت</label>
+                                        <div class="d-flex align-items-center">
+                                            <button type="button" class="btn btn-sm btn-info play-audio-btn me-2" data-audio-src="${URL.createObjectURL(file)}">
+                                                <i class="fas fa-play"></i> تشغيل
+                                            </button>
+                                            <span>${file.name}</span>
+                                        </div>
+                                        <input type="hidden" name="audio_filename[]" value="${file.name}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="question_${index}" class="form-label">السؤال</label>
+                                        <input type="text" class="form-control" name="question[]" id="question_${index}" placeholder="السؤال">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="answer_${index}" class="form-label">الإجابة</label>
+                                        <textarea class="form-control" name="answer[]" id="answer_${index}" rows="2" placeholder="الإجابة"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label for="subcategory_id_${index}" class="form-label">الفئة الفرعية</label>
+                                        <select class="form-control" name="subcategory_id[]" id="subcategory_id_${index}">
+                                            @foreach ($subcategories as $subcategory)
+                                                <option value="{{ $subcategory->id }}">{{ $subcategory->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        mediaFieldsContainer.appendChild(audioFieldGroup);
+                    });
+                }
+            });
+
+            // تشغيل الصوت عند النقر على زر التشغيل
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('play-audio-btn') || e.target.closest('.play-audio-btn')) {
+                    const btn = e.target.classList.contains('play-audio-btn') ? e.target : e.target.closest(
+                        '.play-audio-btn');
+                    const audioSrc = btn.getAttribute('data-audio-src');
+                    const audio = new Audio(audioSrc);
+                    audio.play();
+
+                    // تغيير الأيقونة عند التشغيل
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+
+                        audio.addEventListener('ended', function() {
+                            icon.classList.remove('fa-pause');
+                            icon.classList.add('fa-play');
+                        });
+                    }
+                }
+            });
+        });
 
         function toggleEditMediaInput(id, selectElement) {
             const audioInput = document.getElementById(`audioInput${id}`);
@@ -246,20 +361,6 @@
             } else {
                 audioInput.classList.add('d-none');
                 videoInput.classList.remove('d-none');
-            }
-        }
-
-        function addAudioInput() {
-            const container = document.getElementById('audioInputsContainer');
-            const newGroup = document.querySelector('.audio-input-group').cloneNode(true);
-            newGroup.querySelectorAll('input, textarea, select').forEach(input => input.value = '');
-            container.appendChild(newGroup);
-        }
-
-        function removeAudioInput(button) {
-            const container = document.getElementById('audioInputsContainer');
-            if (container.children.length > 1) {
-                button.closest('.audio-input-group').remove();
             }
         }
     </script>

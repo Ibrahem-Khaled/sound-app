@@ -11,7 +11,7 @@ class MediaController extends Controller
 {
     public function index()
     {
-        $media = Media::all();
+        $media = Media::where('type', 'audio')->get();
         $subcategories = SubCategory::all();
         return view('dashboard.media', compact('media', 'subcategories'));
     }
@@ -21,17 +21,17 @@ class MediaController extends Controller
         $request->validate([
             'title.*' => 'nullable|string|max:255',
             'description.*' => 'nullable|string',
-            'type.*' => 'required|in:audio,video',
-            'path.*' => 'required',
+            // 'type.*' => 'required|in:audio,video',
+            // 'path.*' => 'required',
             'path.*' => 'nullable|file|mimes:mp3,wav,ogg',
             'question.*' => 'nullable|string|max:255',
             'answer.*' => 'nullable|string',
-            'subcategory_id.*' => 'required|exists:sub_categories,id',
+            'subcategory_id.*' => 'required|exists:sub_categorys,id',
         ]);
 
         $titles = $request->title;
         $descriptions = $request->description;
-        $types = $request->type;
+        $types = $request->type ?? [];
         $paths = $request->path;
         $questions = $request->question;
         $answers = $request->answer;

@@ -5,6 +5,7 @@ use App\Http\Controllers\dashboard\CategoryController;
 use App\Http\Controllers\dashboard\MediaController;
 use App\Http\Controllers\dashboard\subCategoryController;
 use App\Http\Controllers\dashboard\UserController;
+use App\Http\Controllers\dashboard\WatchController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard'], function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('subcategories', subCategoryController::class);
     Route::resource('media', MediaController::class);
+    Route::resource('watch', WatchController::class);
     Route::resource('books', BookController::class);
     Route::resource('users', UserController::class);
 
